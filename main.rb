@@ -3,6 +3,7 @@
 require 'gosu'
 
 require_relative 'player'
+require_relative 'wall'
 
 class GameWindow < Gosu::Window
 
@@ -15,6 +16,7 @@ class GameWindow < Gosu::Window
 
     # Must pass in image when creating player
     @player = Player.new(Gosu::Image.new(self, "assets/player.png", false))
+    @wall = Wall.new(10,50)
   end
 
   def update
@@ -55,6 +57,7 @@ class GameWindow < Gosu::Window
 
   def draw
     @player.draw
+    @wall.draw
   end
 
   def needs_cursor?
