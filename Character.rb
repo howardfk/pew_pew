@@ -54,4 +54,42 @@ class Character
     @image.draw(self.x, self.y, 1, self.angle)
   end
 
+  # Chnge name if needed 
+  # Passe values to the managment class to update on window
+  def update
+    w_down = Gosu::button_down? Gosu::KbW
+    a_down = Gosu::button_down? Gosu::KbA
+    s_down = Gosu::button_down? Gosu::KbS
+    d_down = Gosu::button_down? Gosu::KbD
+    left_shift_down = Gosu::button_down? Gosu::KbLeftShift
+
+    x_vel=0
+    y_vel=0
+
+    if w_down && s_down
+    elsif w_down
+      y_vel=-1
+    elsif s_down
+      y_vel=1
+    end
+
+    if a_down && d_down
+    elsif a_down
+      x_vel=-1
+    elsif d_down
+      x_vel=1
+    end
+
+    if left_shift_down
+      @player.is_running=true
+    else
+      @player.is_running=false
+    end
+
+    @player.move(x_vel, y_vel)
+
+    # Update direction of player after setting player's x,y 
+    @player.point_to(self.mouse_x, self.mouse_y)     
+  end
+
 end
