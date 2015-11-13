@@ -35,19 +35,19 @@ class Character
       x_speed = x_speed!=0 ? (x_speed>0 ? 1 : -1) : 0
       y_speed = y_speed!=0 ? (y_speed>0 ? 1 : -1) : 0
 
-    # Movment Angles 0:pi/4:2pi
-    movement_angle = self.movement_angle(x_speed,y_speed)
+      # Movment Angles 0:pi/4:2pi
+      movement_angle = self.movement_angle(x_speed,y_speed)
 
-    # Distatnce to move
-    # previous code used if,then to determ if running
-    # this code will assign speed=speed*mod_speed, if running mod_speed!=1 else pick mod_speed
-    #movement_diff renamed ot move_diff
-     
-    move_diff = is_running ? self.player_speed * self.speed_mod : self.player_speed
-    # Do we need to update mod_speed befor we calculate the move_diff?
-
-    self.x_pos += Gosu::offset_x(movement_angle, move_diff)
-    self.y_pos += Gosu::offset_y(movement_angle, move_diff)
+      # Distatnce to move
+      # previous code used if,then to determ if running
+      # this code will assign speed=speed*mod_speed, if running mod_speed!=1 else pick mod_speed
+      #movement_diff renamed ot move_diff
+      
+      move_diff = is_running ? self.player_speed * self.speed_mod : self.player_speed
+      # Do we need to update mod_speed befor we calculate the move_diff?
+      
+      self.x_pos += Gosu::offset_x(movement_angle, move_diff)
+      self.y_pos += Gosu::offset_y(movement_angle, move_diff)
     end
   end
 
