@@ -1,7 +1,7 @@
 class Character
   attr_accessor :angle, :x_pos, :y_pos, :speed, :speed_mod, :is_running, :player_speed
 
-  def initialize(image, speed=4, speed_mod=1, x_pos=100, y_pos=100, angle=0) 
+  def initialize(image, speed=4, speed_mod=2, x_pos=100, y_pos=100, angle=0) 
     @image = image;
     if !image
       @image=Gosu::Image.new("assets/player.png")
@@ -13,7 +13,7 @@ class Character
     self.y_pos = y_pos
     self.angle = angle
 
-    self.player_speed = speed*speed_mod
+    self.player_speed = speed
     self.is_running = false
 
     #this varbule might not be needed 
@@ -42,7 +42,8 @@ class Character
     # previous code used if,then to determ if running
     # this code will assign speed=speed*mod_speed, if running mod_speed!=1 else pick mod_speed
     #movement_diff renamed ot move_diff
-    move_diff = self.player_speed
+     
+    move_diff = is_running ? self.player_speed * self.speed_mod : self.player_speed
     # Do we need to update mod_speed befor we calculate the move_diff?
 
     self.x_pos += Gosu::offset_x(movement_angle, move_diff)
@@ -51,7 +52,7 @@ class Character
   end
 
   def draw
-    @image.draw(self.x_pos, self.y_pos, 1, self.angle)
+    @image.draw_rot(self.x_pos, self.y_pos, 1, self.angle, 0.5, 0.7)
   end
 
   # Chnge name if needed 
