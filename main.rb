@@ -7,8 +7,8 @@ require_relative 'Player'
 
 class GameWindow < Gosu::Window
 
-  SCREEN_HEIGHT=600
-  SCREEN_WIDTH=800
+  SCREEN_HEIGHT=800
+  SCREEN_WIDTH=900
 
   def initialize
     super SCREEN_WIDTH, SCREEN_HEIGHT, false
@@ -16,11 +16,13 @@ class GameWindow < Gosu::Window
 
     # Must pass in image when creating player
     @player = Player.new(Gosu::Image.new(self, "assets/player.png", false))
-    @wall = Wall.new(10,50)
+    #@wall = Wall.new(10,50)
   end
 
   def update
-    # Fallowing code moved to Charicter#Update
+    # Player info that is upated, movment requires the mouse_y from Gosu::window
+    @player.update(self.mouse_x, self.mouse_y)
+    # Fallowing 34 lines moved to Charicter#Update
     #w_down = Gosu::button_down? Gosu::KbW
     #a_down = Gosu::button_down? Gosu::KbA
     #s_down = Gosu::button_down? Gosu::KbS
@@ -58,7 +60,7 @@ class GameWindow < Gosu::Window
 
   def draw
     @player.draw
-    @wall.draw
+    #@wall.draw
   end
 
   def needs_cursor?

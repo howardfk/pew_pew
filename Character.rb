@@ -1,5 +1,5 @@
 class Character
-  attr_accessor :angle, :x_pos, :y_pos, :speed, :speed_mod, :is_running
+  attr_accessor :angle, :x_pos, :y_pos, :speed, :speed_mod, :is_running, :player_speed
 
   def initialize(image, speed=4, speed_mod=1, x_pos=100, y_pos=100, angle=0) 
     @image = image;
@@ -20,7 +20,7 @@ class Character
     @speed_mod = speed_mod
   end
 
-  #was pint_to
+  #was point_to
   def face_to(look_x, look_y)
     self.angle = Gosu::angle(self.x_pos, self.y_pos, look_x, look_y)
   end
@@ -36,7 +36,7 @@ class Character
       y_speed = y_speed!=0 ? (y_speed>0 ? 1 : -1) : 0
 
     # Movment Angles 0:pi/4:2pi
-    movement_angle = self.movment_angle(x_speed,y_speed)
+    movement_angle = self.movement_angle(x_speed,y_speed)
 
     # Distatnce to move
     # previous code used if,then to determ if running
@@ -51,12 +51,12 @@ class Character
   end
 
   def draw
-    @image.draw(self.x, self.y, 1, self.angle)
+    @image.draw(self.x_pos, self.y_pos, 1, self.angle)
   end
 
   # Chnge name if needed 
   # Passe values to the managment class to update on window
-  def update
+  def update(mouse_x, mouse_y)
     w_down = Gosu::button_down? Gosu::KbW
     a_down = Gosu::button_down? Gosu::KbA
     s_down = Gosu::button_down? Gosu::KbS
@@ -81,15 +81,15 @@ class Character
     end
 
     if left_shift_down
-      @player.is_running=true
+      self.is_running = true
     else
-      @player.is_running=false
+      self.is_running = false
     end
 
-    @player.move(x_vel, y_vel)
+    self.move(x_vel, y_vel)
 
     # Update direction of player after setting player's x,y 
-    @player.point_to(self.mouse_x, self.mouse_y)     
+    self.face_to(mouse_x, mouse_y)     
   end
 
 end
