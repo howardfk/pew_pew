@@ -30,6 +30,7 @@ class GameWindow < Gosu::Window
   def draw
     @player.draw
     @bot.draw
+    test = draw_quad(20,20, Gosu::Color.rgba(100,100,245,0.5),9,295, Gosu::Color.rgb(200,200,200), 100, 25, Gosu::Color.argb(0xff_00ffff), 200, 205, Gosu::Color.argb(0xff_00ffff), 2)
     #@wall.draw
   end
 
