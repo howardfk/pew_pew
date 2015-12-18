@@ -76,7 +76,7 @@ class ImpactTree
   #   noting the position of each object in the tree.... 
   def retrive(return_data = Array.new, obj_bounds)
     index = getQuad(obj_bounds)
-    (index != -1) && self.nodes[0] != nil) ? retrive return_data, obj_bounds : nil
+    (index != -1) && (self.nodes[0] != nil) ? retrive(return_data, obj_bounds) : nil
     self.data_list.each{|obj_bounds| return_data << obj_bounds}
   end
 
