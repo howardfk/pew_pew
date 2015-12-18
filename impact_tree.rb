@@ -1,40 +1,41 @@
-#require_relative 'shape/shape'
+#require_relative 'shape/rectangle'
 # ImpactTree is a quadtree. Determins objects that are likely to collide in a 2-D spcae.
 # ImpactTree beavor is manipulated with class varbles. Allows for control over depth of tree.
 #   @@max_level and @@max_data allow ballance of memory useage vs performance
 # data_list are all the objects your intersted in tracking stored in a node
 
 class ImpactTree
-  @@max_data = 1
-  @@max_level = 20
+  @@max_data = 1000
+  @@max_level = 20000
+  attr_accessor :level, :node_bounds, :nodes, :data_list
   # node_bounds is a Shape that has positoin, and dimentions.
   # More info in the shape class
-  def initiatize(level=0, node_bounds)
-    attr_accessor :level, :node_bounds
+
+  def initialize(node_bounds, level)
     @level  = level
     @node_bounds = node_bounds
-    @data_list  = array.new
+    @data_list  = Array.new
     @nodes = Array.new
   end
 
-  def clear
-    @data_list.clear
-    self.nodes.each{|node| node.clear}
+  def unload
+    self.data_list.clear
+    self.nodes.each{|node| node.unload}
   end
 
   # Splits a node into children subnodes with new sub-bounds.
   # Assume all bounds are retangles in this model 
   def branch
-    sub_high  = self.node_bounds.width/2
+    sub_hight= self.node_bounds.width/2
     sub_width = self.node_bounds.hight/2
     x = self.node_bounds.x
     y = self.node_bounds.y
 
     self.nodes = Array.new
-    nodes << ImpactTree(self.level += 1, Shape.new(x + sub_width, y + sub_hight, sub_width, sub_hight))
-    nodes << ImpactTree(self.level += 1, Shape.new(x - sub_width, y + sub_hight, sub_width, sub_hight))
-    nodes << ImpactTree(self.level += 1, Shape.new(x - sub_width, y - sub_hight, sub_width, sub_hight))
-    nodes << ImpactTree(self.level += 1, Shape.new(x + sub_width, y - sub_hight, sub_width, sub_hight))
+    nodes << ImpactTree.new(self.level += 1, Rectangle.new(x + sub_width, y + sub_hight, sub_width, sub_hight))
+    nodes << ImpactTree.new(self.level += 1, Rectangle.new(x - sub_width, y + sub_hight, sub_width, sub_hight))
+    nodes << ImpactTree.new(self.level += 1, Rectangle.new(x - sub_width, y - sub_hight, sub_width, sub_hight))
+    nodes << ImpactTree.new(self.level += 1, Rectangle.new(x + sub_width, y - sub_hight, sub_width, sub_hight))
   end
 
   # obj_bounds is a Shape class object
@@ -59,7 +60,7 @@ class ImpactTree
     # This probably will need to be addressed in the managment class
   end
 
-  # Incerting objects for collition detection must be from the shape class
+  # Incerting shapes for collition detection must be from the shape class
   def insert(obj_bounds)
     self.nodes[0] != nil ? 
       (index = getQuad(obj_bounds) 
@@ -74,9 +75,9 @@ class ImpactTree
 
   # I feel like there is a faster way to do the retrive by 
   #   noting the position of each object in the tree.... 
-  def retrive(return_data = Array.new, obj_bounds)
+  def retrive(obj_bounds, return_data = Array.new)
     index = getQuad(obj_bounds)
-    (index != -1) && (self.nodes[0] != nil) ? retrive(return_data, obj_bounds) : nil
+    (index != -1) && (self.nodes[0] != nil) ? retrive(obj_bounds, return_data) : nil
     self.data_list.each{|obj_bounds| return_data << obj_bounds}
   end
 
