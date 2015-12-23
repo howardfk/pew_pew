@@ -3,38 +3,63 @@ require_relative 'lib/shape/rectangle'
 require_relative 'lib/shape/shape'
 require_relative 'impact_tree'
 require 'gosu'
+ 
+#Setting up global varibles for testing
+$height = 400
+$width= 600
 
-screensize = Rectangle.new(25,25,50,50)
+$masterlist = Array.new
+for i in 1..200
+  x = rand(6...$width) 
+  y = rand(12..$height)
+  temp = Rectangle.new(x, y, 12, 6)
+  $masterlist << temp
+end  
 
-myTree = ImpactTree.new(screensize,0)
-# Making a list of random objects insize a 50x50 box
-# all objets will be, 2x4 rectangles with random positions
+ 
+$screen_box = Rectangle.new($width/2,$height/2, $height, $width)
 
-masterlist = Array.new
-for i in 1..90
-  puts "the #{i}th loop"
-  x = rand(2..48) 
-  y = rand(4..46)
-  temp = Rectangle.new(x, y, 4, 2)
-  masterlist << temp
-  puts temp.inspect
+class GameWindow < Gosu::Window
+  SCREEN_HEIGHT = $height
+  SCREEN_WIDTH = $width 
+
+  def initialize
+    super SCREEN_WIDTH, SCREEN_HEIGHT, false
+    self.caption = "DEBUG THE TREE!"
+  end
+
+  def update
+  end
+
+  def draw
+    #test = draw_quad(20,20, Gosu::Color.rgba(100,100,245,0.5),9,295, Gosu::Color.rgb(200,200,200), 100, 25, Gosu::Color.argb(0xff_00ffff), 200, 205, Gosu::Color.argb(0xff_00ffff), 2)
+    
+    #mycolor = Gosu::Color.rgba(100,100,245,0.5)
+    mycolor = Gosu::Color.argb(0xff_00ffff)
+    $masterlist.each{|thing| makeShape(thing, mycolor)}
+
+    myTree = ImpactTree.new($screen_box,0)
+    myTree.unload
+    for i in 0...$masterlist.length
+      myTree.insert($masterlist[i])
+    end
+
+    color_red = Gosu::Color.argb(0xff_ff0000)
+    makeShape($masterlist[0], color_red)
+    puts myTree.retrive($masterlist[0]).length
+  end
+
+  def makeShape(rect, color)
+    draw_quad(rect.left, rect.upper, color, rect.right, rect.upper, color, rect.right, rect.lower, color, rect.left, rect.lower, color)
+  end
 end
 
+window = GameWindow.new
+window.show
 
-#masterlist.each{|thing| puts thing.upper 
-  #thing.lower}
-#puts 'MASTER LIST THING'
-#puts masterlist[masterlist.length-1].inspect
 
-myTree.unload
-#for i in 0..masterlist.length
-  #puts masterlist[i]
-  #myTree.insert(masterlist[i])
-#end
+#masterlist.each{|stuff| myTree.insert(stuff)}
 
-masterlist.each{|stuff| puts stuff.inspect 
-  myTree.insert(stuff)}
-puts 'INSPECT'
-puts masterlist[0].inspect
-puts masterlist[0].upper
-myTree.retrive(masterlist[0])
+
+#myTree.retrive(masterlist[0])
+
