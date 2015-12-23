@@ -42,9 +42,6 @@ class ImpactTree
   # obj_bounds is a Shape class object
   # getQuad retuns index 0..3 represent each subquad
   def getQuad(obj_bounds)
-    if (obj_bounds == nil) 
-      puts "obj_boudns not defined at get quad"
-    end
     index = -1
     #Boolen values indicate if item is complety contained in half boundrys
     #remeber self.nodes[0].lower == self.nodes[3].upper
@@ -66,9 +63,6 @@ class ImpactTree
 
   # obj_bounds passed for collition detection must be from the shape class
   def insert(obj_bounds)
-    if (obj_bounds == nil) 
-      puts "obj_boudns not defined @@@@@ insert"
-    end
     if self.nodes.empty? == false
       index = getQuad(obj_bounds)
       if index != -1
