@@ -9,15 +9,15 @@ $height = 400
 $width= 600
 
 $masterlist = Array.new
-for i in 1..200
-  x = rand(6...$width) 
-  y = rand(12..$height)
+for i in 1..20
+  x = rand(24...$width-24) 
+  y = rand(12..$height-12)
   temp = Rectangle.new(x, y, 12, 6)
   $masterlist << temp
 end  
 
  
-$screen_box = Rectangle.new($width/2,$height/2, $height, $width)
+$screen_box = Rectangle.new($width/2,$height/2, $width, $height)
 
 class GameWindow < Gosu::Window
   SCREEN_HEIGHT = $height
@@ -26,6 +26,7 @@ class GameWindow < Gosu::Window
   def initialize
     super SCREEN_WIDTH, SCREEN_HEIGHT, false
     self.caption = "DEBUG THE TREE!"
+    @txt = Gosu::Font.new(self,"Georgia",16)
   end
 
   def update
@@ -37,7 +38,10 @@ class GameWindow < Gosu::Window
     green = Gosu::Color.argb(0xff_00ff00)
     red = Gosu::Color.argb(0xff_ff0000)
 
-    $masterlist.each{|thing| makeShape(thing, teal)}
+    # add text here to the thing
+    $masterlist.each{|thing| makeShape(thing, teal)
+    @txt.draw("#{thing.x}, #{thing.y}", thing.x, thing.y, 4)}
+    
 
     myTree = ImpactTree.new($screen_box,0)
     myTree.unload
@@ -47,7 +51,8 @@ class GameWindow < Gosu::Window
     makeShape($masterlist[0], red)
 
     near = myTree.retrive($masterlist[0])
-    puts near.length
+    #puts near.length
+    puts myTree.inspect
     near.each{|thing| makeShape(thing,green)}
     makeShape($masterlist[0], red)
   end
