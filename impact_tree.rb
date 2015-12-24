@@ -5,8 +5,8 @@
 # data_list are all the objects your intersted in tracking stored in a node
 
 class ImpactTree
-  @@max_data = 4
-  @@max_level = 3
+  @@max_data = 2
+  @@max_level = 5
   attr_accessor :level, :node_bounds, :nodes, :data_list
   # node_bounds is a Shape that has positoin, and dimentions.
   # More info in the shape class
