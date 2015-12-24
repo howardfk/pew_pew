@@ -32,21 +32,24 @@ class GameWindow < Gosu::Window
   end
 
   def draw
-    #test = draw_quad(20,20, Gosu::Color.rgba(100,100,245,0.5),9,295, Gosu::Color.rgb(200,200,200), 100, 25, Gosu::Color.argb(0xff_00ffff), 200, 205, Gosu::Color.argb(0xff_00ffff), 2)
-    
     #mycolor = Gosu::Color.rgba(100,100,245,0.5)
-    mycolor = Gosu::Color.argb(0xff_00ffff)
-    $masterlist.each{|thing| makeShape(thing, mycolor)}
+    teal = Gosu::Color.argb(0xff_00ffff)
+    green = Gosu::Color.argb(0xff_00ff00)
+    red = Gosu::Color.argb(0xff_ff0000)
+
+    $masterlist.each{|thing| makeShape(thing, teal)}
 
     myTree = ImpactTree.new($screen_box,0)
     myTree.unload
-    for i in 0...$masterlist.length
-      myTree.insert($masterlist[i])
-    end
 
-    color_red = Gosu::Color.argb(0xff_ff0000)
-    makeShape($masterlist[0], color_red)
-    puts myTree.retrive($masterlist[0]).length
+    $masterlist.each{|thing| myTree.insert(thing)}
+
+    makeShape($masterlist[0], red)
+
+    near = myTree.retrive($masterlist[0])
+    puts near.length
+    near.each{|thing| makeShape(thing,green)}
+    makeShape($masterlist[0], red)
   end
 
   def makeShape(rect, color)
@@ -56,10 +59,3 @@ end
 
 window = GameWindow.new
 window.show
-
-
-#masterlist.each{|stuff| myTree.insert(stuff)}
-
-
-#myTree.retrive(masterlist[0])
-

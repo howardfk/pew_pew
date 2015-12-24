@@ -26,21 +26,22 @@ class ImpactTree
   # Splits a node into children subnodes with new sub-bounds.
   # Assume all bounds are retangles in this model 
   def branch
-    sub_hight= self.node_bounds.width/2.0
-    sub_width = self.node_bounds.hight/2.0
+    sub_width = self.node_bounds.width/2.0
+    sub_hight = self.node_bounds.hight/2.0
     x = self.node_bounds.x
     y = self.node_bounds.y
 
     self.nodes = Array.new
     level = self.level + 1
-    self.nodes << ImpactTree.new(Rectangle.new(x + sub_width/2, y + sub_hight/2, sub_width, sub_hight), level)
-    self.nodes << ImpactTree.new(Rectangle.new(x - sub_width/2, y + sub_hight/2, sub_width, sub_hight), level)
-    self.nodes << ImpactTree.new(Rectangle.new(x - sub_width/2, y - sub_hight/2, sub_width, sub_hight), level)
+    # Need to consider the rounding errors and if we planon doing hole numbers
     self.nodes << ImpactTree.new(Rectangle.new(x + sub_width/2, y - sub_hight/2, sub_width, sub_hight), level)
+    self.nodes << ImpactTree.new(Rectangle.new(x - sub_width/2, y - sub_hight/2, sub_width, sub_hight), level)
+    self.nodes << ImpactTree.new(Rectangle.new(x - sub_width/2, y + sub_hight/2, sub_width, sub_hight), level)
+    self.nodes << ImpactTree.new(Rectangle.new(x + sub_width/2, y + sub_hight/2, sub_width, sub_hight), level)
   end
 
   # obj_bounds is a Shape class object
-  # getQuad retuns index 0..3 represent each subquad
+  # getQuad retuns index 0..3 represent each subquad of self
   def getQuad(obj_bounds)
     index = -1
     #Boolen values indicate if item is complety contained in half boundrys
@@ -64,7 +65,7 @@ class ImpactTree
   # obj_bounds passed for collition detection must be from the shape class
   def insert(obj_bounds)
     if self.nodes.empty? == false
-      index = getQuad(obj_bounds)
+      index = self.getQuad(obj_bounds)
       if index != -1
         self.nodes[index].insert(obj_bounds)
       end
@@ -73,15 +74,15 @@ class ImpactTree
     self.data_list << obj_bounds
 
     if ((self.data_list.length > @@max_data) && (level < @@max_level))
-      if self.nodes[0] == nil
+      if self.nodes.empty? == true
         self.branch
       end 
 
       self.data_list.each{|thing| 
-        index = getQuad(thing)
-        #index = 1
+        index = self.getQuad(thing)
         if index != -1
-          self.nodes[index].data_list << obj_bounds 
+          self.nodes[index].data_list << thing
+          self.data_list.delete(thing)
         end}
     end
   end
@@ -89,7 +90,7 @@ class ImpactTree
   # I feel like there is a faster way to do the retrive by 
   #   noting the position of each object in the tree.... 
   def retrive(obj_bounds, return_data = Array.new)
-    index = getQuad(obj_bounds)
+    index = self.getQuad(obj_bounds)
     if (index != -1) && (self.nodes[0] != nil)
       self.nodes[index].retrive(obj_bounds, return_data)
     end
