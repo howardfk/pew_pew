@@ -6,7 +6,7 @@ class Rectangle < Polygon
   attr_reader :perimeter, :area, :upper, :lower, :left, :right
   attr_accessor :hight, :width
 
-  def initialize(x, y, hight, width)
+  def initialize(x, y, width, hight)
     super(x, y, 4)
     @hight = hight
     @width = width
