@@ -9,7 +9,7 @@ $height = 400
 $width= 600
 
 $masterlist = Array.new
-for i in 1..20
+for i in 1..10
   x = rand(24...$width-24) 
   y = rand(12..$height-12)
   temp = Rectangle.new(x, y, 12, 6)
@@ -37,28 +37,40 @@ class GameWindow < Gosu::Window
     teal = Gosu::Color.argb(0xff_00ffff)
     green = Gosu::Color.argb(0xff_00ff00)
     red = Gosu::Color.argb(0xff_ff0000)
+    gray = Gosu::Color.argb(0xff_808080)
 
     # add text here to the thing
-    $masterlist.each{|thing| makeShape(thing, teal)
+    $masterlist.each{|thing| make_shape(thing, teal)
     @txt.draw("#{thing.x}, #{thing.y}", thing.x, thing.y, 4)}
     
-
     myTree = ImpactTree.new($screen_box,0)
     myTree.unload
 
     $masterlist.each{|thing| myTree.insert(thing)}
 
-    makeShape($masterlist[0], red)
+    make_shape($masterlist[0], red)
 
-    near = myTree.retrive($masterlist[0])
+    near = myTree.retrieve($masterlist[0])
     #puts near.length
     puts myTree.inspect
-    near.each{|thing| makeShape(thing,green)}
-    makeShape($masterlist[0], red)
+    near.each{|thing| make_shape(thing,green)}
+    make_shape($masterlist[0], red)
+
+    list_box = myTree.get_node_bounds
+
+    list_box.each{|box| 
+      make_line([box.x, box.lower], [box.x, box.upper], gray)
+      make_line([box.left,  box.y], [box.right, box.y], gray)
+      }
+
   end
 
-  def makeShape(rect, color)
+  def make_shape(rect, color)
     draw_quad(rect.left, rect.upper, color, rect.right, rect.upper, color, rect.right, rect.lower, color, rect.left, rect.lower, color)
+  end
+
+  def make_line(pair1, pair2, color, z=1)
+    draw_line(pair1[0], pair1[1], color, pair2[0], pair2[1], color, z)
   end
 end
 
