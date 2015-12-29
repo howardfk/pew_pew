@@ -5,8 +5,8 @@
 # data_list are all the objects your intersted in tracking stored in a node
 
 class ImpactTree
-  @@max_data = 2
-  @@max_level = 5
+  @@max_data = 5
+  @@max_level = 1
   attr_accessor :level, :node_bounds, :nodes, :data_list
   # node_bounds is a Shape that has positoin, and dimentions.
   # More info in the shape class
@@ -95,5 +95,15 @@ class ImpactTree
       self.nodes[index].retrieve(obj_bounds, return_data)
     end
     self.data_list.each{|obj_bounds| return_data << obj_bounds}
+  end
+
+  def get_node_bounds(return_bounds = Array.new)
+    if self.nodes[0] != nil
+      self.nodes[0].get_node_bounds(return_bounds)
+      self.nodes[1].get_node_bounds(return_bounds)
+      self.nodes[2].get_node_bounds(return_bounds)
+      self.nodes[3].get_node_bounds(return_bounds)
+    end
+    return_bounds << self.node_bounds 
   end
 end
