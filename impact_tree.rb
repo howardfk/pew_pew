@@ -5,8 +5,8 @@
 # data_list are all the objects your intersted in tracking stored in a node
 
 class ImpactTree
-  @@max_data = 5
-  @@max_level = 1
+  @@max_data = 2
+  @@max_level = 4
   attr_accessor :level, :node_bounds, :nodes, :data_list
   # node_bounds is a Shape that has positoin, and dimentions.
   # More info in the shape class
@@ -27,44 +27,48 @@ class ImpactTree
   # Assume all bounds are retangles in this model 
   def branch
     sub_width = self.node_bounds.width/2.0
-    sub_hight = self.node_bounds.hight/2.0
+    sub_height = self.node_bounds.height/2.0
     x = self.node_bounds.x
     y = self.node_bounds.y
 
     self.nodes = Array.new
     level = self.level + 1
     # Need to consider the rounding errors and if we planon doing hole numbers
-    self.nodes << ImpactTree.new(Rectangle.new(x + sub_width/2, y - sub_hight/2, sub_width, sub_hight), level)
-    self.nodes << ImpactTree.new(Rectangle.new(x - sub_width/2, y - sub_hight/2, sub_width, sub_hight), level)
-    self.nodes << ImpactTree.new(Rectangle.new(x - sub_width/2, y + sub_hight/2, sub_width, sub_hight), level)
-    self.nodes << ImpactTree.new(Rectangle.new(x + sub_width/2, y + sub_hight/2, sub_width, sub_hight), level)
+    self.nodes << ImpactTree.new(Rectangle.new(x + sub_width/2, y - sub_height/2, sub_width, sub_height), level)
+    self.nodes << ImpactTree.new(Rectangle.new(x - sub_width/2, y - sub_height/2, sub_width, sub_height), level)
+    self.nodes << ImpactTree.new(Rectangle.new(x - sub_width/2, y + sub_height/2, sub_width, sub_height), level)
+    self.nodes << ImpactTree.new(Rectangle.new(x + sub_width/2, y + sub_height/2, sub_width, sub_height), level)
   end
 
   # obj_bounds is a Shape class object
   # getQuad retuns index 0..3 represent each subquad of self
+  # re write get quad to return "node tree structure" and use bounds and data to do waht we need
   def getQuad(obj_bounds)
     index = -1
-    #Boolen values indicate if item is complety contained in half boundrys
-    #remeber self.nodes[0].lower == self.nodes[3].upper
+    puts self.inspect
     top_half    = ((obj_bounds.upper > self.nodes[0].node_bounds.upper) && (obj_bounds.lower < self.nodes[0].node_bounds.lower)) ? true : false
-    top_half    = ((obj_bounds.upper > self.nodes[0].node_bounds.upper) && (obj_bounds.lower < self.nodes[0].node_bounds.lower)) ? true : false
-    bottom_half = ((obj_bounds.upper > self.nodes[0].node_bounds.lower) && (obj_bounds.lower < self.nodes[3].node_bounds.lower)) ? true : false
-    left_half   = ((obj_bounds.left  > self.nodes[1].node_bounds.left ) && (obj_bounds.right < self.nodes[1].node_bounds.right)) ? true : false
-    right_half  = ((obj_bounds.right < self.nodes[0].node_bounds.right) && (obj_bounds.left  > self.nodes[1].node_bounds.left )) ? true : false
+    #top_half    = ((obj_bounds.upper > self.nodes[0].node_bounds.upper) && (obj_bounds.lower < self.nodes[0].node_bounds.lower)) ? true : false
+    right_half  = ((obj_bounds.right < self.nodes[0].node_bounds.right) && (obj_bounds.left  > self.nodes[0].node_bounds.left )) ? true : false
+    bottom_half = !top_half
+    left_half   = !right_half
 
     index = (top_half    && right_half) ? 0 : index
     index = (top_half    && left_half ) ? 1 : index
     index = (bottom_half && left_half ) ? 2 : index
-    index = (top_half    && right_half) ? 3 : index
+    index = (bottom_half && right_half) ? 3 : index
+
+    #index = (top_half    && right_half) ? self.nodes[0] : index
+    #index = (top_half    && left_half ) ? self.nodes[1] : index
+    #index = (bottom_half && left_half ) ? self.nodes[2] : index
+    #index = (top_half    && right_half) ? self.nodes[3] : index
 
     # Need to consider outlyer case if object moves past the edge of map where:
-    #   obj_bounds.upper && obj_bounds.lower < 0
-    # This probably will need to be addressed in the managment class
   end
 
   # obj_bounds passed for collition detection must be from the shape class
   def insert(obj_bounds)
-    if self.nodes.empty? == false
+    # rewrite the  next 6 lines to use a returned node instead of index for get quad
+    unless self.nodes.empty?
       index = self.getQuad(obj_bounds)
       if index != -1
         self.nodes[index].insert(obj_bounds)
@@ -90,11 +94,17 @@ class ImpactTree
   # I feel like there is a faster way to do the retrieve by 
   #   noting the position of each object in the tree.... 
   def retrieve(obj_bounds, return_data = Array.new)
-    index = self.getQuad(obj_bounds)
-    if (index != -1) && (self.nodes[0] != nil)
-      self.nodes[index].retrieve(obj_bounds, return_data)
+    #look into if the getQaud is causing an error for the root case
+    #unless self.node.empty?
+    if (self.nodes[0] != nil)
+      index = self.getQuad(obj_bounds)
+      if index != -1 
+        self.nodes[index].retrieve(obj_bounds, return_data)
+      end
     end
-    self.data_list.each{|obj_bounds| return_data << obj_bounds}
+    unless self.data_list.empty?
+      self.data_list.each{|obj_bounds| return_data << obj_bounds}
+    end
   end
 
   def get_node_bounds(return_bounds = Array.new)
