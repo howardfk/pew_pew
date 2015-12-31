@@ -9,7 +9,7 @@ $height = 400
 $width= 600
 
 $masterlist = Array.new
-for i in 1..20
+for i in 1..30
   x = rand(24...$width-24) 
   y = rand(12..$height-12)
   temp = Rectangle.new(x, y, 12, 6)
@@ -48,10 +48,10 @@ class GameWindow < Gosu::Window
     #myTree.unload
 
     $masterlist.each{|thing| myTree.insert(thing)}
-    #puts myTree.inspect
-    #puts $masterlist[0].inspect
     near = myTree.retrieve($masterlist[0])
-    puts near.length
+    near_ids = Array.new
+    #near.each{|thing| near_ids << thing.object_id}
+
 
     make_shape($masterlist[0], red)
 
@@ -61,11 +61,15 @@ class GameWindow < Gosu::Window
     make_shape($masterlist[0], red)
 
     list_box = myTree.get_node_bounds
-    lvl=1
+    lvl=0.02
+    puts list_box.inspect
+    puts list_box.length
     list_box.each{|box| 
+      lvl+=0.006
       v_gray = Gosu::Color.rgba(255,255,255,(255*lvl).floor)
-      make_line([box.x, box.lower], [box.x, box.upper], v_gray)
-      make_line([box.left,  box.y], [box.right, box.y], v_gray)
+      make_shape(box, v_gray)
+      #make_line([box.x, box.lower], [box.x, box.upper], v_gray)
+      #make_line([box.left,  box.y], [box.right, box.y], v_gray)
       }
 
   end
