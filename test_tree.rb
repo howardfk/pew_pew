@@ -9,7 +9,7 @@ $height = 400
 $width= 600
 
 $masterlist = Array.new
-for i in 1..30
+for i in 1..9
   x = rand(24...$width-24) 
   y = rand(12..$height-12)
   temp = Rectangle.new(x, y, 12, 6)
@@ -45,25 +45,30 @@ class GameWindow < Gosu::Window
     @txt.draw("#{thing.x}, #{thing.y}", thing.x, thing.y, 4)}
     
     myTree = ImpactTree.new($screen_box,0)
-    #myTree.unload
 
     $masterlist.each{|thing| myTree.insert(thing)}
+
     near = myTree.retrieve($masterlist[0])
+    myTree.puts_nodes
+    
+    #puts "Refferince \n X: #{$masterlist[0].x} Y:#{$masterlist[0].y} "
+    #i=0
+    #near.each{|thing| i+=1
+      #puts " item {i} X: #{thing.x} Y: #{thing.y} Upper: #{thing.upper} Lower: #{thing.lower} 
+      #L: #{thing.left} R: #{thing.right} "}
+
     near_ids = Array.new
     #near.each{|thing| near_ids << thing.object_id}
 
 
     make_shape($masterlist[0], red)
 
-    #puts near.length
-    #puts myTree.inspect
     near.each{|thing| make_shape(thing,green)}
     make_shape($masterlist[0], red)
 
     list_box = myTree.get_node_bounds
     lvl=0.02
-    puts list_box.inspect
-    puts list_box.length
+    #puts list_box.length
     list_box.each{|box| 
       lvl+=0.006
       v_gray = Gosu::Color.rgba(255,255,255,(255*lvl).floor)
