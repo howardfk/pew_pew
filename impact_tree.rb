@@ -81,6 +81,20 @@ class ImpactTree
         self.branch
       end 
 
+      i=0
+      while i<self.data_list.size
+        obj = self.data_list[i]
+        index = self.getQuad(obj)
+        unless index == -1
+          self.nodes[index].data_list << obj
+          self.data_list.delete_at(i)
+        else
+          i+=1
+        end
+      end
+    end
+
+=begin
       self.data_list.each{|thing| 
         index = self.getQuad(thing)
         unless index == -1
@@ -90,6 +104,7 @@ class ImpactTree
         end
         }
     end
+=end
   end
 
   # I feel like there is a faster way to do the retrieve by 
