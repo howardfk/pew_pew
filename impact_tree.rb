@@ -113,24 +113,14 @@ class ImpactTree
   # I feel like there is a faster way to do the retrieve by 
   # noting the position of each object in the tree.... 
   def retrieve(obj_bounds) #, return_data = Array.new)
+    return_array = Array.new(self.data_list)
     unless self.nodes.empty?
       index = self.getQuad(obj_bounds)
       unless index == -1 
-        #if (defined? return_data) == nil
-          #return_data = Array.new
-        #end
-        self.nodes[index].retrieve(obj_bounds)
+        return_array += self.nodes[index].retrieve(obj_bounds)
       end
     end
-    
-    unless self.data_list.empty?
-      if (defined? return_data) == nil
-        return_data = Array.new
-      end
-      self.data_list.each{|items| return_data << items}
-      return return_data
-      #return_data = return_data + self.data_list
-    end
+    return_array
   end
 
   # Function used for truble shooting, very expensive to use
