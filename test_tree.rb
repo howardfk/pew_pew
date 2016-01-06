@@ -9,7 +9,7 @@ $height = 400
 $width= 600
 
 $masterlist = Array.new
-for i in 1..9
+for i in 1..5
   x = rand(24...$width-24) 
   y = rand(12..$height-12)
   temp = Rectangle.new(x, y, 12, 6)
@@ -47,36 +47,29 @@ class GameWindow < Gosu::Window
     myTree = ImpactTree.new($screen_box,0)
 
     $masterlist.each{|thing| myTree.insert(thing)}
+    myTree.puts_nodes
 
     near = myTree.retrieve($masterlist[0])
-    myTree.puts_nodes
-    
-    #puts "Refferince \n X: #{$masterlist[0].x} Y:#{$masterlist[0].y} "
-    #i=0
-    #near.each{|thing| i+=1
-      #puts " item {i} X: #{thing.x} Y: #{thing.y} Upper: #{thing.upper} Lower: #{thing.lower} 
-      #L: #{thing.left} R: #{thing.right} "}
-
-    near_ids = Array.new
-    #near.each{|thing| near_ids << thing.object_id}
-
-
+    puts "near is type #{near.class}"
     make_shape($masterlist[0], red)
-
-    near.each{|thing| make_shape(thing,green)}
+    unless near == nil
+      puts "number of close items: #{near.length}"
+      near.each{|thing| make_shape(thing,green)}
+    end
     make_shape($masterlist[0], red)
 
     list_box = myTree.get_node_bounds
-    lvl=0.02
-    #puts list_box.length
+
+    lvl = 0.02
+    alpha = 0.1/list_box.length 
     list_box.each{|box| 
-      lvl+=0.006
-      v_gray = Gosu::Color.rgba(255,255,255,(255*lvl).floor)
+      lvl += alpha
+      v_gray = Gosu::Color.rgba(215,215,215,(255*lvl).floor)
       make_shape(box, v_gray)
       #make_line([box.x, box.lower], [box.x, box.upper], v_gray)
       #make_line([box.left,  box.y], [box.right, box.y], v_gray)
       }
-
+  #return
   end
 
   def make_shape(rect, color)

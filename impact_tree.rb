@@ -5,7 +5,7 @@
 # data_list are all the objects your intersted in tracking stored in a node
 
 class ImpactTree
-  @@max_data = 5
+  @@max_data = 4
   @@max_level = 4
   attr_accessor :level, :node_bounds, :nodes, :data_list
   # node_bounds is a Shape that has positoin, and dimentions.
@@ -31,9 +31,8 @@ class ImpactTree
     x = self.node_bounds.x
     y = self.node_bounds.y
 
-    self.nodes = Array.new
     level = self.level + 1
-    # Need to consider the rounding errors and if we planon doing hole numbers
+    # Need to consider the rounding errors and if we plan on doing hole numbers
     self.nodes << ImpactTree.new(Rectangle.new(x + sub_width/2, y - sub_height/2, sub_width, sub_height), level)
     self.nodes << ImpactTree.new(Rectangle.new(x - sub_width/2, y - sub_height/2, sub_width, sub_height), level)
     self.nodes << ImpactTree.new(Rectangle.new(x - sub_width/2, y + sub_height/2, sub_width, sub_height), level)
@@ -45,21 +44,25 @@ class ImpactTree
   # re write get quad to return "node tree structure" and use bounds and data to do waht we need
   def getQuad(obj_bounds)
     index = -1
-    top_half    = ((obj_bounds.upper > self.nodes[0].node_bounds.upper) && (obj_bounds.lower < self.nodes[0].node_bounds.lower)) ? true : false
-    #top_half    = ((obj_bounds.upper > self.nodes[0].node_bounds.upper) && (obj_bounds.lower < self.nodes[0].node_bounds.lower)) ? true : false
-    right_half  = ((obj_bounds.right < self.nodes[0].node_bounds.right) && (obj_bounds.left  > self.nodes[0].node_bounds.left )) ? true : false
-    bottom_half = !top_half
-    left_half   = !right_half
+    top_half = ((obj_bounds.upper > self.nodes[0].node_bounds.upper) && (obj_bounds.lower < self.nodes[0].node_bounds.lower))
+    bot_half = ((obj_bounds.upper > self.nodes[3].node_bounds.upper) && (obj_bounds.lower < self.nodes[3].node_bounds.lower))
+    r_half   = ((obj_bounds.right < self.nodes[0].node_bounds.right) && (obj_bounds.left  > self.nodes[0].node_bounds.left ))
+    l_half   = ((obj_bounds.right < self.nodes[1].node_bounds.right) && (obj_bounds.left  > self.nodes[1].node_bounds.left ))
+    
+    error = top_half && bot_half || r_half && l_half
+    if error
+      puts "QUAD TREE IS BORKEN"
+    end
 
-    index = (top_half    && right_half) ? 0 : index
-    index = (top_half    && left_half ) ? 1 : index
-    index = (bottom_half && left_half ) ? 2 : index
-    index = (bottom_half && right_half) ? 3 : index
+    index = (top_half && r_half) ? 0 : index
+    index = (top_half && l_half ) ? 1 : index
+    index = (bot_half && l_half ) ? 2 : index
+    index = (bot_half && r_half) ? 3 : index
 
-    #index = (top_half    && right_half) ? self.nodes[0] : index
-    #index = (top_half    && left_half ) ? self.nodes[1] : index
-    #index = (bottom_half && left_half ) ? self.nodes[2] : index
-    #index = (top_half    && right_half) ? self.nodes[3] : index
+    #index = (top_half    && r_half) ? self.nodes[0] : index
+    #index = (top_half    && l_half ) ? self.nodes[1] : index
+    #index = (bot_half && l_half ) ? self.nodes[2] : index
+    #index = (top_half    && r_half) ? self.nodes[3] : index
 
     # Need to consider outlyer case if object moves past the edge of map where:
   end
@@ -82,18 +85,18 @@ class ImpactTree
       end 
 
       i=0
-      while i<self.data_list.size
-        obj = self.data_list[i]
-        index = self.getQuad(obj)
+      while i < self.data_list.size
+        temp_obj = self.data_list[i]
+        index = self.getQuad(temp_obj)
+        puts index
         unless index == -1
-          self.nodes[index].data_list << obj
+          self.nodes[index].data_list << temp_obj
           self.data_list.delete_at(i)
         else
           i+=1
         end
       end
     end
-
 =begin
       self.data_list.each{|thing| 
         index = self.getQuad(thing)
@@ -113,18 +116,24 @@ class ImpactTree
     unless self.nodes.empty?
       index = self.getQuad(obj_bounds)
       unless index == -1 
+        #if (defined? return_data) == nil
+          #return_data = Array.new
+        #end
         self.nodes[index].retrieve(obj_bounds)
       end
     end
     
     unless self.data_list.empty?
-      #if defined? return_data == nil
+      if (defined? return_data) == nil
         return_data = Array.new
-      #end
-      self.data_list.each{|things| return_data << things}
+      end
+      self.data_list.each{|items| return_data << items}
+      return return_data
+      #return_data = return_data + self.data_list
     end
   end
 
+  # Function used for truble shooting, very expensive to use
   def get_node_bounds(return_bounds = Array.new)
     if self.nodes[0] != nil
       self.nodes[0].get_node_bounds(return_bounds)
