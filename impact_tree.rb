@@ -43,27 +43,26 @@ class ImpactTree
   # getQuad retuns index 0..3 represent each subquad of self
   # re write get quad to return "node tree structure" and use bounds and data to do waht we need
   def getQuad(obj_bounds)
-    index = -1
-    top_half = ((obj_bounds.upper > self.nodes[0].node_bounds.upper) && (obj_bounds.lower < self.nodes[0].node_bounds.lower))
-    bot_half = ((obj_bounds.upper > self.nodes[3].node_bounds.upper) && (obj_bounds.lower < self.nodes[3].node_bounds.lower))
-    r_half   = ((obj_bounds.right < self.nodes[0].node_bounds.right) && (obj_bounds.left  > self.nodes[0].node_bounds.left ))
-    l_half   = ((obj_bounds.right < self.nodes[1].node_bounds.right) && (obj_bounds.left  > self.nodes[1].node_bounds.left ))
-    
-    error = top_half && bot_half || r_half && l_half
-    if error
-      puts "QUAD TREE IS BORKEN"
+
+    unless nodes.empty?
+      top_half = ((obj_bounds.upper > self.nodes[0].node_bounds.upper) && (obj_bounds.lower < self.nodes[0].node_bounds.lower))
+      bot_half = ((obj_bounds.upper > self.nodes[3].node_bounds.upper) && (obj_bounds.lower < self.nodes[3].node_bounds.lower))
+      r_half   = ((obj_bounds.right < self.nodes[0].node_bounds.right) && (obj_bounds.left  > self.nodes[0].node_bounds.left ))
+      l_half   = ((obj_bounds.right < self.nodes[1].node_bounds.right) && (obj_bounds.left  > self.nodes[1].node_bounds.left ))
+      
+      error = top_half && bot_half || r_half && l_half
+      if error
+        puts "QUAD TREE IS BORKEN"
+      end
+      
+      if (top_half && r_half)     then return self.nodes[0]
+      elsif (top_half && l_half ) then return self.nodes[1]
+      elsif (bot_half && l_half ) then return self.nodes[2]
+      elsif (bot_half && r_half)  then return self.nodes[3]
+      end
     end
-
-    index = (top_half && r_half) ? 0 : index
-    index = (top_half && l_half ) ? 1 : index
-    index = (bot_half && l_half ) ? 2 : index
-    index = (bot_half && r_half) ? 3 : index
-
-    #index = (top_half    && r_half) ? self.nodes[0] : index
-    #index = (top_half    && l_half ) ? self.nodes[1] : index
-    #index = (bot_half && l_half ) ? self.nodes[2] : index
-    #index = (top_half    && r_half) ? self.nodes[3] : index
-
+    # return nil if nothing found
+    nil
     # Need to consider outlyer case if object moves past the edge of map where:
   end
 
@@ -71,9 +70,9 @@ class ImpactTree
   def insert(obj_bounds)
     # rewrite the  next 6 lines to use a returned node instead of index for get quad
     unless self.nodes.empty?
-      index = self.getQuad(obj_bounds)
-      unless index == -1
-        self.nodes[index].insert(obj_bounds)
+      quad = self.getQuad(obj_bounds)
+      if quad
+        quad.insert(obj_bounds)
       end
     end
 
@@ -87,10 +86,10 @@ class ImpactTree
       i=0
       while i < self.data_list.size
         temp_obj = self.data_list[i]
-        index = self.getQuad(temp_obj)
-        puts index
-        unless index == -1
-          self.nodes[index].data_list << temp_obj
+        quad = getQuad(temp_obj)
+        # puts index
+        if quad
+          quad.data_list << temp_obj
           self.data_list.delete_at(i)
         else
           i+=1
@@ -112,13 +111,11 @@ class ImpactTree
 
   # I feel like there is a faster way to do the retrieve by 
   # noting the position of each object in the tree.... 
-  def retrieve(obj_bounds) #, return_data = Array.new)
+  def retrieve(obj_bounds)
     return_array = Array.new(self.data_list)
-    unless self.nodes.empty?
-      index = self.getQuad(obj_bounds)
-      unless index == -1 
-        return_array += self.nodes[index].retrieve(obj_bounds)
-      end
+    quad = getQuad(obj_bounds)
+    if quad
+      return_array += quad.retrieve(obj_bounds)
     end
     return_array
   end
